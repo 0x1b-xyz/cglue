@@ -10,7 +10,6 @@
     <modules>
         <module>maven</module>
         <module>core</module>
-        <module>bootstrap</module>
         <module>api</module>
     </modules>
     <packaging>pom</packaging>
