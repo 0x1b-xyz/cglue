@@ -17,16 +17,16 @@ Composition
 
 ### cglue-api
 
-Provides a set of interfaces that can be used in implementing your [App](api/src/main/java/cglue/App.java). The
- responsibility of an app is to instantiate the [Server](api/src/main/java/cglue/Server.java) which wraps around
+Provides a set of interfaces that can be used in implementing your [App](cglue/api/src/main/java/cglue/App.java). The
+ responsibility of an app is to instantiate the [Server](cglue/api/src/main/java/cglue/Server.java) which wraps around
  the process being managed by the framework.
 
 An Application
 -----
 
-An app originates from an [Artifact](api/src/main/java/cglue/Artifact.java) where cglue will be able to find the
- [`META-INF/cglue/app.properties`](api/src/main/resources/cglu/app.properties) file that configures the runtime to
- execute the lifecycle of your [App](api/src/main/java/cglue/App.java) implementation.
+An app originates from an [Artifact](cglue/api/src/main/java/cglue/Artifact.java) where cglue will be able to find the
+ [`META-INF/cglue/app.properties`](cglue/api/src/main/resources/cglu/app.properties) file that configures the runtime to
+ execute the lifecycle of your [App](cglue/api/src/main/java/cglue/App.java) implementation.
 
 ```groovy
     @Log
@@ -58,7 +58,7 @@ Configuration
 -----
 
 Configuration is sourced from the `app.properties` file of your artifact. This file contains the "default" configuration
- that will resolved on a per attribute basis by the [Config](api/src/main/java/cglue/Config) interface using this
+ that will resolved on a per attribute basis by the [Config](cglue/api/src/main/java/cglue/Config) interface using this
  order:
 
 * Environment
@@ -106,8 +106,8 @@ Usage
     mvn cglue:prepare
 
 Running the prepare goal will "instrument" your Maven module artifact with the contents of the `src/main/go` directory
-that contains the application [api/src/main/java/cglue/App.java] implementation and your
-[api/src/main/resources/cglue/app.properties] like so:
+that contains the application [App](cglue/api/src/main/java/cglue/App.java) implementation and your
+[app.properties](cglue/api/src/main/resources/cglue/app.properties) like so:
 
     exampleapp/
         src/main/cglue
