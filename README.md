@@ -2,12 +2,72 @@ cglue
 =====
 
 CuriousGlue "cglue" is an operations and management tool for configuring and executing an application runtime that
-enables you to launch one or more server processes using a simple set of commands.
+ enables you to launch one or more server processes using a simple set of commands.
 
-cglue solves the challenge of providing a lifecycle around application phases that is consistent across environments
-from development to production. An "app" could consist of any sort of process - a database server, a tomcat instance,
-etc.. An app is composed of an [api/src/main/java/cglue/Artifact.java] where we'll find the
-`META-INF/cglue/app.properties` file that gives us the path to your [api/src/main/java/cglue/App.java] implementation.
+cglue solves the challenge of providing a lifecycle around applications that is consistent across environments: from
+ development on to production. A simple set of files placed in a location within the application artifact is all that
+ is required to make use of the cglue command line interface - while the Maven plugin goals provide hooks to implement
+ and test your app lifecycle.
+
+An "app" could consist of any sort of process - a database server, a tomcat instance, a local file processing daemon,
+ etc..
+
+Composition
+-----
+
+### cglue-api
+
+Provides a set of interfaces that can be used in implementing your [App](api/src/main/java/cglue/App.java). The
+ responsibility of an app is to instantiate the [Server](api/src/main/java/cglue/Server.java) which wraps around
+ the process being managed by the framework.
+
+An Application
+-----
+
+An app originates from an [Artifact](api/src/main/java/cglue/Artifact.java) where cglue will be able to find the
+ [`META-INF/cglue/app.properties`](api/src/main/resources/cglu/app.properties) file that configures the runtime to
+ execute the lifecycle of your [App](api/src/main/java/cglue/App.java) implementation.
+
+```groovy
+    @Log
+    class MyWebApp implements cglue.App {
+
+        final Go go
+
+        MyWebApp(Go go) {
+           this.go = go
+        }
+
+        Server initialize() {
+           return new TomcatServer(go)
+        }
+        void starting() {
+            ...
+            log.info("Configuring the dispatcher.xml file ...")
+            go.config.bind(go.docBase.read('META-INF/cglue/myapp/dispatcher.xml'), go.docBase.write('WEB-INF/classes/dispatcher.xml'))
+        }
+        void stopping() {
+            log.info("Making a backup of the app home directory ...")
+            go.ant.copy(dir: go.appHome, dest: new File(go.config.props['myapp.backupDir']))
+        }
+
+    }
+````
+
+Configuration
+-----
+
+Configuration is sourced from the `app.properties` file of your artifact. This file contains the "default" configuration
+ that will resolved on a per attribute basis by the [Config](api/src/main/java/cglue/Config) interface using this
+ order:
+
+* Environment
+* System Property
+* Command line switch or Maven configuration override
+* `META-INF/cglue/app.properties`
+
+The configuration is used to make decisions within the `App` implementation. Another common use is to write the elements
+ out to a file that can be accessed by your runtime application.
 
 Usage
 -----
@@ -48,6 +108,12 @@ Usage
 Running the prepare goal will "instrument" your Maven module artifact with the contents of the `src/main/go` directory
 that contains the application [api/src/main/java/cglue/App.java] implementation and your
 [api/src/main/resources/cglue/app.properties] like so:
+
+    exampleapp/
+        src/main/cglue
+            ExampleApp.groovy
+            app.properties
+
 
 
 
